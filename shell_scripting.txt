@@ -250,6 +250,10 @@ z. top
 aa. create a user with default home directory
 	useradd anusha
 	passwd anusha
+	
+For password authentication of new user to login as user:
+	vi /etc/ssh/sshd_config
+
      
     create a user with custom home directory
     	useradd -d /data/anusha chaitanya
