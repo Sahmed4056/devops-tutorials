@@ -352,7 +352,163 @@ ae. sed - SED command in UNIX stands for stream editor and it can perform lots o
 	unzip backup.zip
 	tar -xzvf backup.tar.gz
 
-19.
+=========
+Day-3
+===========
+#!/bin/bash
+wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.63/bin/apache-tomcat-9.0.63.tar.gz
+tar -xzvf apache-tomcat-9.0.63.tar.gz
+mv apache-tomcat-9.0.63 tomcat9
+rm -rf apache-tomcat-9.0.63.tar.gz
+
+1. Execute above commands in shell script
+2. Variabilize the tomcat version
+3. Variabilize required tomcat version
+4. Pass the version values from argument during shell script execution
+
+===============================================
+Command line arguments or positional arguments
+===============================================
+Command line arguments are the arugments/values passed during shell script execution on the         command prompt.
+
+#!/bin/bash
+echo $y
+
+#/bin/bash
+echo $1
+echo $2
+echo $3
+
+./cmd_arg.sh
+
+./cmd_arg.sh 10 20 30
+
+./cmd_arg.sh 10 20 30 40 50
+
+./cmd_arg.sh hello chaitanya ahmed
+
+#/bin/bash
+echo $0
+echo $1
+echo $2
+echo $3
+
+./cmd_arg.sh hello chaitanya ahmed
+o/p:- cmd_arg.sh hello chaitanya ahmed
+
+$# --> Print the total number of arguments
+$* & $@ --> Display all the command line arguments
+
+#/bin/bash
+echo $0
+echo $1
+echo $2
+echo $3
+#echo $10
+echo ${10}
+
+
+
+ 
+################
+Input & output commands for shell script
+################
+create a shell script to convert small letters to uppercase
+#!/bin/bash
+myname="ChAitanya"
+myname_up=${myname^^}
+echo "My name in uppercase is: ${myname_up}"
+
+Here the echo command is the output command which is always displaying output.
+
+
+uc2: create a shell script to convert small letters to uppercase by taking any input value
+
+#!/bin/bash
+read myname
+#myname="ChAitanya"
+myname_up=${myname^^}
+echo "My name in uppercase is: ${myname_up}"
+
+
+uc3:- convert small letters to uppercase by taking any input value & display message read details
+#!/bin/bash
+read -p "My name is": myname
+echo $REPLY
+#myname="ChAitanya"
+myname_up=${myname^^}
+echo "My name in uppercase is: ${myname_up}"
+
+REPLY is the default command for the read command.
+
+
+UC4:- Enter the tomcat version by prompting
+#!/bin/bash
+tomcat_ver=9.0.27
+read -p "Enter tomcat version:" tomcat_ver
+wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.63/bin/apache-tomcat-9.0.63.tar.gz
+tar -xzvf apache-tomcat-9.0.63.tar.gz
+mv apache-tomcat-9.0.63 tomcat9
+rm -rf apache-tomcat-9.0.63.tar.gz
+
+
+#####################
+Arthmetic opearaters in shell scripts
+####################
+In shell script by default the variables will be treated as string and not integers.
+So this makes us some complexity while comparing strings/numbers during loops/conditional statements.
+
+uc1:- For doing integer arthmetic operation we use "(( ))" parenthesis
+	x=20
+	y=10
+
+	((sum=x+y))  echo $sum --> 30
+	((sub=x-y))   echo $sub --> 10
+	((mul=x*y))
+	((div=x/y))
+	((rem=x%y))
+	((x=x++))
+	((x=x--))
+	((x=x+10))
+	((x=2+1))
+
+uc2:- For doing float arthmetic operation we use bc
+	x=2.5
+	y=3.2
+	
+	bc<<<"$x+$y"
+	5.7
+	
+	x=26
+	y=8995
+	
+	bc<<<"$y/x"
+	bc<<<"scale=1;$y/$x"
+	bc<<<"scale=2;$y/$x"
+	myresult=$(bc<<<"scale=2;$y/$x")
+
+uc3:- Create a shell script for sum operations
+	#/bin/bash
+	x=1
+	y=2
+	((sum=x+y))
+	echo "$sum"
+
+uc4:- Read data from command line
+	#/bin/bash
+	read -p "Enter x value:" x
+	read -p "Enter y value:" y
+	((sum=x+y))
+	echo "$sum"
+	
+uc5:-	If x & y are float values
+
+	#/bin/bash
+	read -p "Enter x value:" x
+	read -p "Enter y value:" y
+	sum=$(bc<<<"scale=2;$x+y")
+	echo $sum
+
 
 
 
