@@ -1,0 +1,121 @@
+==============================================================================
+				Day-1
+==============================================================================
+Shell script used to automate repetative tasks in Unix.
+What is shell script?
+It's a text used to write system level commands in sequence inorder to achieve our requirement.
+
+
+usecase:
+-----------
+Find the 
+	- Version of httpd
+	- status of httpd service
+	- Port listening {cat /etc/httpd/conf/httpd.conf | grep -i ^Listen}
+
+
+#!/bin/bash
+httpd --version
+systemctl status httpd
+cat /etc/httpd/conf/httpd.conf | grep -i ^Listen
+
+
+The above shell script is a simple shell script, we can enhance this script using,
+- Variables
+- Filters like grep, awk, tail..etc commands
+- loops
+- Conditional statements & many more
+
+
+#!/bin/bash
+httpd_v=`httpd --version | awk ${print $3}`
+httpd_status=`systemctl status httpd | grep Active | awk ${print $2}`
+httpd_port=`cat /etc/httpd/conf/httpd.conf | grep -i ^Listen | awk ${print $2}`
+echo "The version of httpd is: $httpd_v"
+echo "The status of httpd is: $httpd_status"
+echo "The port of httpd is: ${httpd_port}"
+
+
+chmod +x httpd_details.sh
+./httpd_details.sh
+
+1. Whenever we execute any command/script on the terminal it will reach to operating system & the    opearating system reacts to the command with the program called shell.
+
+2. In our unix world we have different types of shells. To see these different shells
+   cat /etc/shells
+
+	/bin/sh
+	/bin/bash
+	/bin/zsh
+	/bin/ksh
+
+3. a. In this bash is the advanced & latest shell.
+   b. Now a days almost by default all the flavours of unix operating systems works with bash shell          programming.
+   c. Because of this reason bash scripting we call.
+   d. There is no other major difference in writing scripting in other shells, just bash is the latest       & advanced shell. 
+==================================================
+
+General purpose in Linux
+a. pwd  --> Prints the current working directory
+   
+   whatis --> Simple description about the command	
+		whatis pwd
+   
+   man --> Display description of command & usage of command
+	man pwd
+
+b. whoami --> Find login user
+c. id --> Print the user id details
+d. clear --> Clear the screen
+e. touch --> Used to create empty file
+	  touch 1.out 2.out
+
+	File create options
+		touch <filename>
+		echo "Hello" > samp.txt
+		echo "world" >> samp.txt
+	
+	To view data in filename
+		cat filename
+
+f. ls   --> List the files
+	ls -l  {list the files with full details like permissions, owner,group, size & file name}
+	ls -all {List the hidden files also}
+	ls -ltr {List the files in ascending order based on timestamp}
+
+g. mkdir --> Creates a direcotry
+	mkdir dir1 dir2
+	mkdir -p dir3/dir4/dir5
+
+g. cd   --> Get inside of directory
+
+h. date --> with formats
+	 date
+	 date --help
+	 date +%d
+	 date +%m
+	 date +%Y
+	 date +%d%m%Y
+
+i. Rename file/directory
+	mv <src_file> <dest_file>
+	
+   Move file into directory
+	mv <src_file> <directory>
+	
+j. Copy file/directory directory
+	cp <src_file> <dir>
+	cp -r <src_dir> <dest_dir>
+	
+k. Delete file
+	rm <filename>
+	rmdir <dir>
+	rm -r <dir>
+l. WC
+	cat <file> | wc -l
+	cat <file> | wc -w
+	cat <file> | wc -c
+	
+m. head & tail
+	cat <file> | head -2
+	cat <file> | tail -2

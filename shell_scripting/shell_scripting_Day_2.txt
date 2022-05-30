@@ -1,0 +1,231 @@
+=============================================================================
+						Day-2
+=============================================================================
+n. grep - This filter search a particular pattern in a file & displays all the lines that matches to             the pattern.
+
+	unix is great os. unix is opensource. unix is free os.
+	Unix linux which one you choose.
+	uNix is easy to learn.unix is a multiuser os.Learn unix .unix is a powerful.
+	
+	cat <file> | grep "unix"
+	cat <file> | grep -i "unix"
+	cat <file> | grep -n "unix" {Displays the lines containing unix string & show the line number}
+	cat <file> | grep -v "unix" {Displays the lines not containing unix string}
+	cat <file> | grep "^unix"
+	cat <file> | grep "unix*"
+	cat temp.txt | egrep 'great|operating'
+	
+o. more <file>
+
+p. sort - Sort command used to sort a file & arranges records in particular order.
+	cat > file.txt
+abhishek
+chitransh
+satish
+rajan
+naveen
+divyam
+harsh
+
+	sort file.txt
+	abhishek
+	abhishek
+	chitransh
+	satish
+	rajan
+	naveen
+	divyam
+	harsh
+	
+
+q. uniq - uniq is the tool that helps to detect the adjacent duplicate lines and also deletes the           duplicate lines
+   cat kt.txt
+I love music.
+I love music.
+I love music.
+I love cricket.
+I love music.
+
+
+r. history
+
+s. which --> Check exsistance of command
+	which useradd
+	which echo
+
+t. wget --> To download files from internet/any intranet url.
+
+u. uptime
+   hostname
+   cat /etc/redht-realese
+   hostname
+   hostnamectl
+   ifconfig
+
+v. cut - cut command used to extract parts of the each line from a file.
+	 It will extract the parts of the line based
+		- byte/character based
+		- field based on delimeter (By default the delimeter is tab)
+
+   i. Get first character from a file
+	cut -c 1 /etc/passwd
+	cut -b 1 /etc/passwd
+
+   ii. Get the characeters from all the lines from 1-10 characters of a file
+	cut -c 1-10 /etc/passwd
+	cut -c -10 /etc/passwd
+
+   iii. Get the characters some particular range
+	cut -c 2-3, 10-12 /etc/passwd
+	cut -c 1- /etc/passwd
+
+
+	one	two	three
+	four	five	six
+	seven	eight	nine
+
+    iv. Fetch fields of particular files using field seperator
+	cut -f 1,3 samp.out
+	cut -f 1 samp.out
+
+     v. If delemeter is other than tab
+	
+	one;two;three
+	four;five;six
+	seven;eight;nine
+
+	cut -d ';' -f 1 samp.out
+
+	cut -d ':' -f 1,4 /etc/passwd
+
+    vi. Replace the delemeter in output with different delimeter
+	cut -d ':' -f 1,4 /etc/passwd --output-delimeter=' '
+
+    vii. Fetch httpd version alone using cut command
+	httpd -v | grep -i version | cut -d '/' -f 2 | cut -d ' ' -f 1
+
+w. awk - It's a shell script used to process the command text
+	fristName       lastName        age     city       ID
+
+	Thomas          Shelby          30      Rio        400
+	Omega           Night           45      Ontario    600
+	Wood            Tinker          54      Lisbon     N/A
+	Giorgos         Georgiou        35      London     300
+	Timmy           Turner          32      Berlin     N/A	
+
+	cat samp.txt | awk '{print $1, $4}'
+
+x. free -h
+   df -h
+   du -sh
+   
+y. find - useful to check where exactly particular file/folder presents on the machine.
+	find / -name aws
+	
+z. top
+
+aa. create a user with default home directory
+	useradd anusha
+	passwd anusha
+     
+    create a user with custom home directory
+    	useradd -d /data/anusha chaitanya
+
+    change passwd
+	passwd chaitanya
+
+    The created userid details are stored in a file called /etc/passwd
+
+    Whenever we create a user by default one group also will gets created if group not exists.
+
+    To create user & add it under particular group
+	useradd -g tecmint tarunika
+
+    To add users in particular groups
+	groupadd admins
+	groupadd webadmin
+	groupadd developers
+	usermod -a -G admins,webadmin,developers tecmint
+	useradd -G admins,webadmin,developers paddy	
+
+ab. Normally we do three types of operations on files/folder
+	r 	w 	x
+     
+    The chmod permissions
+	r - 4
+	w - 2
+	x - 1
+	 600
+	 rw------
+	rw-rw-r-x
+	u  g  p
+	
+     create a file /tmp directory
+	echo "Checking the permissions of users/groups/public" > /tmp/abc.out
+	chmod 400 /tmp/abc.out
+	
+	Now only the owner have read privileges & try to access the /tmp/abc.out with different user           privilges error will get.
+
+ac. Install pkgs
+	yum list all
+	yum list all installed
+	yum install -y git
+	yum remove git -y
+	yum updte -y
+	yum install nginx -y
+	
+	
+	apt-get for ubuntu inplace of ubuntu
+		
+ad. winscp
+	
+ae. sed - SED command in UNIX stands for stream editor and it can perform lots of functions on file           like 
+		searching, 
+		find and replace, 
+		insertion or deletion.
+
+	unix is great os. unix is opensource. unix is free os.
+	learn operating system.
+	unix linux which one you choose.
+	unix is easy to learn.unix is a multiuser os.Learn unix .unix is a powerful.
+        
+	i. Replace first occurance of unix in a file
+	   sed 's/unix/linux/' temp.txt
+	
+	   s --> substitution.
+	   Replaces all the first occurances of unix pattern in all the lines.
+
+	ii. Replace second occurances of unix in a file
+		sed 's/unix/linux/2' temp.txt
+
+	iii. Replace alloccurances of unix in a file
+		sed 's/unix/linux/g' temp.txt
+	
+17. softlink & hard link
+
+	inode:- address of the file where exactly its stored on harddisk
+
+	hardlink - The original & hardlink file will have same inode
+			   If we delete any file we can access other file also
+			   ln samp hardlink
+
+	softlink - The original & softlink file will have different inode
+			   If we delete original file the softlink can't be accessed.
+				ln -s samp softlink
+				rm softlink	
+	
+
+18. zip
+	zip -r backup.zip backup
+	tar -cvf backup.tar /home/devloper1/backup/
+	tar -czvf backup.tar.gz /home/developer1/backup/
+
+	c - create archive file
+	v - verbose
+	f - file
+	Z- compress
+
+	unzip
+	unzip backup.zip
+	tar -xzvf backup.tar.gz
+

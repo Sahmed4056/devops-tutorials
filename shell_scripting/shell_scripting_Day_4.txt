@@ -1,0 +1,276 @@
+===============================================================================================
+				Day-4
+===============================================================================================
+1. Case statement
+   case statement is mainly useful for menu driven statements.
+   syntax:
+	case $opt in
+		opt1)
+		     statements
+		     ;;
+		opt2)
+		    statements
+		    ;;
+		*)
+		  statements
+		  ;;
+	esac
+
+    a. In the above the case statement starts with case & ends with esac
+    b. $opt values can provided 
+	 - Either by declaring variable
+	 - Captured by positional arguments
+	 - In shell script execution flow the opt value can be picked
+    c. If "opt" values matches to any option(opt1/opt2) then respective statements will be executed
+    d. ;; indicates once the execution of statements completed, execution comes out of case statement.
+
+    uc1:- Create simple calculator for addition/sub/mul/div by reading input values using case 	  statement
+	#!/bin/bash
+	read -p "Enter value of a" a
+	read -p "Enter value of b" b
+	read -p "Choose option 1.sum 2.sub 3.mul 4.div" opt
+	case $opt in
+		1)
+			echo "You have choosen addition option"
+			echo "Addition of $a and $b is: $((a+b))"
+			;;
+		
+		2)
+			echo "You have choosen substraction option"
+			echo "Subtraction of $a and $b is: $((a-b))"
+			;;
+		3)
+			echo "You have choosen multiplication option"
+			echo "Multiplication of $a and $b is: $((a*b))"
+			;;
+		4)
+			echo "You have choosen division option"
+			echo "Division $a and $b is: $((a/b))"
+			;;
+		
+		*)
+			echo "You have choosen invalid option"
+	esac
+
+
+
+2. if and if else
+    a. Relational operators are useful for comparing numeric values
+    ----------------------------------------------------------------
+    a=10
+    b=20
+	-le
+	-lt
+	-ge
+	-gt
+	-eq
+	-ne
+
+
+	b. if condition
+	---------------
+	if <condition>
+	then
+		<statements>
+	fi
+	
+	Example1: check the given number is postive
+
+	#!/bin/bash
+	num=10
+	if [ $num -gt 0 ]
+	then
+	    echo "given number is postive"
+	fi
+
+	Example2:- Compare two strings
+	#!/bin/bash
+	read -p "Enter first string: " VAR1
+	read -p "Enter second string: " VAR2
+	if [[ "$VAR1" == "$VAR2" ]]; then
+    		echo "Strings are equal."
+	else
+    		echo "Strings are not equal."
+	fi
+
+	c.elsif condition
+	-----------------
+	For a scenario where some statement(s) should be executed if the logical expression evaluates 	to true and others when it evaluates to false, an if-then-else statement is used. 
+	
+	If the 	logical expression evaluates to true, the code inside the if-statement is executed if 		it evaluates to false the code inside the else section is executed. 
+
+	if <condition>
+	then
+		<statements>
+		<statements>
+	else
+		<statements>
+		<statements>
+	fi
+
+	Example: check the given number is postive or negative
+	
+	#!/bin/bash
+	echo "Enter a Number"
+	read num
+	if [ $num -lt 0 ]
+	then
+    	    echo "Negative"
+	elif [ $num -gt 0 ]
+	then
+    	    echo "Positive"
+	else
+    	    echo "Neither Positive Nor Negative"
+	fi
+	
+
+	Logical operators
+	---------------------
+	!	logical negation. 
+	This inverts a true condition into false and vice versa.
+	
+	!1 ==> 0
+	!0 ==> 1
+
+	-o	logical OR.       
+	If one of the operands is true, then the condition becomes true.
+	
+	var1 var2 OR (var1 -o var2)
+	0    0     0
+	1    0     1
+	0    1     1
+	1    1     1
+
+	-a	logical AND.
+	If both the operands are true, then the condition becomes true otherwise false.
+	var1  var2   AND (var1 -a var2)
+	0     0      0
+	1     0      0
+	0     1      0
+	1     1      1
+
+    uc:-
+	#!/bin/sh
+	a=10
+	b=20
+
+	if [ $a != $b ]
+	then
+   	    echo "$a != $b : a is not equal to b"
+	else
+   	    echo "$a != $b: a is equal to b"
+	fi
+
+	if [ $a -lt 100 -a $b -gt 15 ]
+	then
+   	    echo "$a -lt 100 -a $b -gt 15 : returns true"
+	else
+   	    echo "$a -lt 100 -a $b -gt 15 : returns false"
+	fi
+
+	if [ $a -lt 5 -o $b -gt 10 ]
+	then
+   	    echo "$a -lt 5 -o $b -gt 10 : returns true"
+	else
+   	    echo "$a -lt 5 -o $b -gt 10 : returns false"
+	fi
+
+
+3. Loops are useful to run the list of commands repeatedly.
+   There are two different loops are available
+	a. While
+	b. For
+
+   a. while loop syntax
+	
+	while [ condition ]
+	do
+	  command1
+	  command2
+          command3
+	done
+
+   Ex: Print numbers from one to ten
+	#!/bin/bash
+	n=1
+	while [ $n -le 10 ]
+	do
+	  echo $n
+	  n=$((n+1)
+	done
+
+
+	b. for loop	syntax:
+	for var in list
+	do
+	   <some-commands-here>
+	done
+
+
+   uc1:- Iterating over a list of simple values:
+
+	#!/bin/bash
+	for var in first second third fourth fifth
+	do
+	  echo The  $var item
+	done
+
+
+    uc2:- Read data line by line & appened line number before the line
+	#!/bin/bash
+	filename='company.txt'
+	n=1
+	while read line; do
+		# reading each line
+		echo "Line No. $n : $line"
+		n=$((n+1))
+	done < $filename
+
+3. Break
+	a. break statement will be executed only inside the loops.
+        b. Irrespective of condition the control will get exited the from loop.
+		while [ condition ]
+		do
+		  statement-1
+		  statement-2
+		  break
+		  statement-3
+                done
+	c. In the above example even the condition true also break statement will brings control out
+	   side the loop.
+
+    uc:-
+	#!/bin/bash
+	for i in $(seq 1 1 10)
+	do
+	if [ $i -eq 6 ]
+	then
+		break
+	fi
+	echo $i
+	done
+
+
+4. continue
+	a. break statement will be executed only inside the loops.
+        b. Exit from current iteration & starts execution for next iteration in the loop.
+
+		while [ condition ]<-----------
+		do			      |
+		  statement-1		      |
+		  statement-2                 |
+		  continue--------------------
+		  statement-3
+                done
+	c. In the above example during first iteration the continue statement skips the statement3 & 	   start execution for next iteration.
+   
+	uc1:
+	#!/bin/bash
+	for i in $(seq 1 1 10)
+	do
+	if [ $i -eq 6 ]
+	then
+		continue
+	fi
+	echo $i
+	done
