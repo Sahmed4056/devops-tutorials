@@ -304,3 +304,9 @@ RUN echo $http_proxy
 ----
 VOL
 ----
+Create a volume inside a container & persist data even container killed/terminated
+FROM ubuntu:latest
+RUN mkdir /data
+WORKDIR /data
+RUN echo "Hello from Volume" > test
+VOLUME /data
