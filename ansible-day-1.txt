@@ -1,0 +1,89 @@
+A. Introduction
+=================
+1. What is configuration Management?
+
+	a. Before we discuss about ansible first will discuss about configuration management tool.
+
+	b. In earlier when we have to install some software in any machine, 
+		i. normally login to server manually
+		ii. Install the required software (tomcat)
+	    iii. Do the changes in configuration of software files to make our application run smoothly.
+		
+	c. Now assume when you have situations to handle large number of servers for installing same software,
+	d. Chances for human errors
+	e. Lot of human efforts required
+	f. To overcome this issue configuration management tool came into picture
+       CM tool taken repsonsbility for making the target systems & softwares in desired and consitent state.
+
+2. In market we have different types of CM tool's
+	- ansible
+	- chef
+	- puppet
+	- salt
+3. Ansible not only acts as configuration management tool but it also support orchestration tool.
+
+4. Orchestration tool nothing provising/creating resoures like ec2 on public clouds like ec2,alb..etc. similar to terraform.
+
+5. But best for choosing ansible for CM & terraform as orchestration tool since some of advanced feature in terraform.
+
+6. Out of these CM tools ansible is the widely used CM tool.
+
+=======================
+B.Ansible architecture
+========================
+a. Create & Explain diagram ansible_day_1.png
+
+				      ------------> Ansible node-0  {Linux}
+b. Ansible controller ------------> Ansible node-1  {ubuntu}
+				      ------------> Ansible node-2  { windows}
+
+c. Ansible controller/Ansible Management Node --> Where is configuration changes needs to be installed.
+
+d. Nodes --> Are the target machine that we going to do configuration changes implement.
+
+e. The connectivity established from Ansible controller to target machines using ssh key based authentication.
+   On target servers we don't required to install any agent software to establish connectivity to controller.
+
+f. hosts --> contains the list of target machines IP/hostnames.
+
+g. playbook --> The script files that we have written to automate the tasks.
+             The playbooks will be written in yml format. YAML nothing but Yaint markup language.
+			 It's a declarative language. Easy to understandable & writable.
+
+C. Why ansible is popular than chef?
+===================================
+a. Ansible works on push based mechanisam but chef works on pull based mechanisam.
+b. Ansible is a agentless configuration management tool but chef is a agent based configuration management tool.
+c. Ansible is supported by Redhat systems, so this is addon all unix flavours.
+
+
+=================
+D. Ansible setup
+=================
+Create one ansible controller & 3 target machines (RHEL, Amazon Linux, Ubuntu)
+
+1. Prepare ansible controller server/EC2
+    a. Create EC2 instance
+	b. Create ansible user
+	c. Add ansible user to sudoers file
+	d. Generate ssh keys for ansible user
+	e. Enable password based authentication
+	f. Check python presence
+	f. Install ansible
+	
+2. Prepare target node
+	a. Create EC2 instance
+	b. create ansible user
+	c. Add ansible user to sudoers file
+	d. Enable password based authentication
+	e. Check python presence
+	
+3. Copy the key of ansible user from controller to target machine ansible user
+	ssh-copy-id ansible@<target-ec2-ip>
+	
+4. Adding target machine details into inventory file
+
+5. Test the connectivity from controller to target machines
+   ansible -m ping all
+   
+   Provide some wrong IP address & check connectivity
