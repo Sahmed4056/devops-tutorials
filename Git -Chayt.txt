@@ -1,0 +1,367 @@
+
+Repository migration from Azure devops to Gitlab
+=========================================================
+
+To Migrate repository from TFS-GIT to GITLAB GIT we can follow two ways bsed on our requirement of carraying histry.
+
+FirstWay#  we can go and migrate repository by using native Gitlab of TFSVC (establised 2013). 
+	   
+		
+	# GoTo Import Repository on Azur Repo => Select TFVC as Source Type => Declear the Path of repository you want to import =>
+		=> select time perioed to carry the history => Give a name of your new Git Repository.
+
+This way will upto 180 days commit history and Single branche of our repository.  
+
+
+
+SecondWay (Prepered) # We have few option to go on second way whicy will carry all the history of repository - 
+
+
+	1. Clone the repository from azure devops
+		git clone <git repo URL in azure devops>
+					OR
+		git clone --bare <git repo URL in azure devops>
+		cd <repo_name>
+
+	2. Create Blank repository without README.md file
+
+	3. Add upstream remote of gitlab repo
+		
+		git remote -v
+		git remote add upstream <gitlab repo URL>
+		git push upstream --all {master branch will be pushed}
+	
+	4. Push all the remote branches
+		for remote in `git branch -r | grep -v master `; do git checkout --track $remote ; done
+		git push -u upstream --all
+	5. Enable the branch policies for main branches.
+
+
+
+				OR
+
+# By using opensource tool gittfs - 
+
+	Install Chocolatey on local machine	
+	Install Git-TFS
+		choco install gittfs
+	List TFSVC repository to see repo details
+		git tfs list-remote-branches <TFSVC url>
+	Clone TFSVC repository tocally
+		git tfs clone <TFSVC url> --branches=all
+		cd <repo_name>
+		git log --all --oneline --decorate --graph
+
+	Now creat an empty repository on gitlab, Copy the gitlab repo url -
+		git remote add origin <gitlab repo url>
+		git push -u origin --all
+
+
+git tfs clone https://dev.azure.com/sharifnahid $/DPC/Solution1 . --branches=all
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+				(or)
+
+1. Clone the repository from azure devops
+	git clone https://chaitanyarv99@dev.azure.com/chaitanyarv99/ERP-CAO/_git/nodejs-docs-hello-world
+
+2. Create Blank repository without README.md file
+
+3. Add upstream remote of gitlab repo
+	cd nodejs-docs-hello-world
+	git push --mirror <remote_repo_url>
+
+
+============================================
+
+
+
+What kind of repositories avaialble in TFS? TFVC & Git
+
+What source code language ? Nodejs/Java/.Net/android
+
+Do they pipelines TFS? yes & its Jenkins
+
+How do the Jenkins pipeline triggering? after merging code into main/development branch
+ - What kind of configuration made to trigger the pipeline in jenkins from azure devops
+
+What is kind of branching startegy they are following in TFS?
+
+In jenkins pipeline what are stages?
+	- Build
+	- Sonar
+	- Quality checks
+	- Docker Image creation for the artifact
+	- Where docker images are stored?
+	- Deployment env {development/QA/PROD}
+	- How QA/PROD deployment happening? Do they have any jenkins job?
+
+Is jenkins job is freestyle or Jenkinsfile file written in declarative way?
+
+Where the builds are running? on Any EC2 agent? or docker containers?
+
+
+
+===============
+Repo: https://github.com/chaitanyaredd/WebAppWithDatabaseDemo
+cd WebApp
+dotnet restore {Restore the nuget packages}
+dotnet build  {builds the artifacts like dll}
+dotnet run {Run application based on the generated dll}
+
+
+================================================
+
+#Install git
+yum install git unzip wget tree -y
+
+#Install Java
+yum install java-11-openjdk* -y
+
+#Jenkins Installation
+cd /opt
+wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+yum install jenkins -y
+systemctl enable jenkins
+systemctl start jenkins
+
+
+# sonar-scanner
+wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
+unzip sonar-scanner-cli-4.7.0.2747-linux.zip
+mv sonar-scanner-4.7.0.2747-linux sonar-scanner
+echo "export PATH=/opt/sonar-scanner/bin:$PATH" >> /etc/profile.d/sonar.sh
+source /etc/profile.d/sonar.sh
+sonar-scanner --version
+
+# Sonarqube Installation
+cd /opt
+wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.4.0.54424.zip
+unzip sonarqube-9.4.0.54424.zip
+mv sonarqube-9.4.0.54424 sonarqube
+useradd sonar
+passwd sonar
+ls -ld /opt/spnarqube/
+chown -R sonar:sonar /opt/sonarqube
+su - sonar -c "/opt/sonarqube/bin/linux-x86-64/sonar.sh start"
+
+
+#Install maven
+cd /opt
+wget https://dlcdn.apache.org/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.tar.gz
+tar -xzvf apache-maven-3.8.5-bin.tar.gz
+mv apache-maven-3.8.5 maven
+echo "export M2_HOME=/opt/maven" >> /etc/profile.d/maven.sh
+echo "export PATH=/opt/maven/bin:$PATH" >> /etc/profile.d/maven.sh
+source /etc/profile.d/maven.sh
+
+
+#Install docker on RHEL8
+dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+dnf install docker-ce --nobest -y
+systemctl start docker
+systemctl enable docker
+
+# Add the jenkins user to docker group
+usermod -aG docker jenkins
+
+# Enable PasswordAuthentication to yes
+sed -i "/^[^#]*PasswordAuthentication[[:space:]]no/c\PasswordAuthentication yes" /etc/ssh/sshd_config
+systemctl reload sshd
+
+# Provide permissions on docker.sock file
+chmod 666 /var/run/docker.sock
+
+# Manual steps
+#cat /var/lib/jenkins/secrets/initialAdminPassword
+#Install suggested plugins
+#Skip admin user creation
+#Install plugins
+#    - Maven Integration
+#    - Sonarqube
+#    - blueocean
+#Integrate Maven in global tool configuration
+
+
+==========================
+
+set no_proxy=github.com
+
+Set#1
+========
+tomcat_m_v=$(echo $tomcat_f_v | cut -c 1)
+
+tomcat_f_v="8.5.79"
+tomcat_m_v=$(echo $tomcat_f_v | cut -c 1)
+wget https://dlcdn.apache.org/tomcat/tomcat-${tomcat_m_v}/v${tomcat_f_v}/bin/apache-tomcat-${tomcat_f_v}.tar.gz
+tar -zxvf apache-tomcat-${tomcat_f_v}.tar.gz
+mv apache-tomcat-${tomcat_f_v} tomcat-${tomcat_m_v}
+mv tomcat-${tomcat_m_v}/ /opt/
+rm -rf apache-tomcat-${tomcat_f_v}.tar.gz
+
+
+Set#2
+=========
+
+#!/bib/bash
+read -p "Enter your name:" myname
+myname_up=${myname^^}
+echo ${myname_up}
+
+
+Set#3
+========
+#!/bin/bash
+read -p "Enter Requesired Tomcat Version: " tomcat_f_v
+tomcat_m_v=$(echo $tomcat_f_v | cut -c 1)
+wget https://dlcdn.apache.org/tomcat/tomcat-${tomcat_m_v}/v${tomcat_f_v}/bin/apache-tomcat-${tomcat_f_v}.tar.gz
+tar -zxvf apache-tomcat-${tomcat_f_v}.tar.gz
+mv apache-tomcat-${tomcat_f_v} tomcat-${tomcat_m_v}
+mv tomcat-${tomcat_m_v}/ /opt/
+rm -rf apache-tomcat-${tomcat_f_v}.tar.gz
+
+
+Set#4
+========
+#!/bin/bash
+read -p "Enter Requesired Tomcat Version: " tomcat_f_v
+tomcat_m_v=$(echo $tomcat_f_v | cut -d '.'-f 1)
+wget https://dlcdn.apache.org/tomcat/tomcat-${tomcat_m_v}/v${tomcat_f_v}/bin/apache-tomcat-${tomcat_f_v}.tar.gz
+tar -zxvf apache-tomcat-${tomcat_f_v}.tar.gz
+mv apache-tomcat-${tomcat_f_v} tomcat-${tomcat_m_v}
+mv tomcat-${tomcat_m_v}/ /opt/
+rm -rf apache-tomcat-${tomcat_f_v}.tar.gz
+cd /opt/tomcat-${tomcat_m_v}/bin
+./startup.sh
+
+
+=======================================
+Set#4
+
+#!/bin/bash
+read -p "Input Value A = " a
+read -p "Input Value B = " b
+read -p "Input Value C = " c
+sum=$((a+b+c))
+
+if [ $a -gt $b -a $a -gt $c ]
+then
+        echo "Maximum value is $a"
+elif [ $b -gt $a -a $b -gt $c ]
+then
+        echo "Maximu value is $b"
+elif [ $c -gt $b -a $c -gt $a ]
+then
+        echo "Maximu value is $c"
+fi
+
+if [ $a -lt $b -a $a -lt $c ]
+then
+        echo "Minimum value is $a"
+elif [ $b -lt $a -a $b -lt $c ]
+then
+        echo "Minimum value is $b"
+elif [ $c -lt $b -a $c -lt $a ]
+then
+        echo "Minimum value is $c"
+fi
+
+if [ $a -eq $b -a $b -eq $c ]
+then
+        echo "ABC all are same valur"
+        echo "Sum of ABC = "$sum
+fi
+
+if [ $a -eq $b ]
+then
+        echo "Value of A & B is Equal"
+elif [ $b -eq $c ]
+then
+        echo "Value of B & C is Equal"
+elif [ $a -eq $c ]
+then
+        echo "Value of A & C is Equal"
+fi
+
+echo "Sum of ABC = "$sum
+
+-- INSERT --
+
+
+=================
+set#5 
+---------
+
+
+#!/bin/bash
+n=1
+for var in `cat /etc/passwd`
+do
+echo "$n: $var"
+n=$((n+1))
+done
+
+=====================
+
+Vi Editor
+-----------
+
+:q! --> Quit without saving
+:wq!  --> Save the changes & Quit
+1G --> Goes to the first line of the file
+3G --> Goes to the third line of the file
+G  --> Goes last line of the file
+dd --> Delete the entire line
+Shift + I --> To insert/delete data in file (insert mode)
+Esc --> Escape mode
+:/<string>  --> To search any string in a file
+%s/then/now/g --> Replace "then" in all places with "now"
+
+
+
+
+set#6
+---------------
+a=1
+b=$a
+while [ $a -le 6 ]
+do
+if [ $a -eq $b ]
+then
+echo "*"
+a=$((a+1))
+fi
+done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
