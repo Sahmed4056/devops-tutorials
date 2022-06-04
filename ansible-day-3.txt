@@ -1,0 +1,106 @@
+A. Ansible modules
+=====================
+a. Modules are predefind commands/units which are used inside the playbooks or commands inorder to execute
+   specific tasks on target machines.
+
+b. Ansible have large extent number of module, we can view it on ansible community side.
+
+c. Explain user module & required parameters
+
+============================
+B. Ansible playbook syntax
+============================
+a. Ansible playbook is a text file written in YAML(Ain't markup language) & stored with format .yml
+
+b. The sample format of that ansible playbook appears as
+
+	Explain every line ansible-day-3.png image
+
+c. The playbooks uses the indendation with spaces inorder to indicate structure of the data.
+
+	---
+	- hosts: all
+	  become: yes
+	tasks:
+		- user:
+			name: john
+			state: present
+		
+	Since we didn't followed indendation in right format we received syntax errors.
+
+d. PLAY RECAP ********************************************************************************************************************************************************************************************
+   client-0x0001              : ok=5    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+   
+   changed means there was a change during the task otherwise the state of the 
+   particular task was the same therefore we see ok which means nothing needed to be changed.
+   
+   unreachable ==> Not able to connect target machine, try with wrong ip address
+   
+   failed ==> Specific task failed due to some erorrs , try with error wrong pakage name
+   
+   skipped ==> Particular task skipped to run on specific host machine, run a task only on ubuntu
+				tasks:
+					- name: "Install git on rhel"
+					  yum:
+						name: git
+						state: present
+					  when: ansible_os_family == rhel8
+						
+					- name: "Install tree on ubuntu"
+					  apt:
+						name: tree
+						state: present
+					  when: ansible_os_family == ubuntu
+					  
+	rescued: Need to work on this.
+
+e. gather_facts ==> i) Used to fetch target machine meta data details/facts
+						Example:
+							"ansible_nodename": "ip-172-31-21-77.ec2.internal",
+							"ansible_os_family": "RedHat",
+							"ansible_pkg_mgr": "yum"
+					
+					ii) By default gather_facts are enabled
+						
+					iii) When we don't have any need of facts we can disable it by setting gather_facts to no
+
+							---
+							- hosts: all
+							  become: yes
+							  gather_facts: no
+							  tasks:
+								- user:
+									name: john
+									state: present				
+												
+f. --check:
+		When ansible-playbook is executed with --check it will not make any changes on remote systems. 
+		It will report what changes they would have made rather than making them.
+		
+		UC:- Create a playbook for kohli user creation & before execute the playbook run it on check mode
+			 On target machine we don't see the kohli user after mode, since mode id dry run, it just report user
+			 creation chage is going to happen
+
+g. UC1:- Create a playbook for installing packages
+
+		---
+		- hosts: all
+		  gather_facts: no
+		  become: yes
+		  tasks:
+			- name: "Install git"
+			  yum:
+				name: git
+				state: present
+				
+	
+	UC2:- Playbook for Install apache(httpd) webserver, start it & later configure it 
+			yum install httpd
+			service httpd start
+			echo "Welcome to ansible" > /var/www/html/index.html
+			
+			
+		
+		
+		
+		ansible-playbook -v user_creation.yml --check
