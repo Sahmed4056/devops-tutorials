@@ -1,3 +1,4 @@
+====================
 A. Ansible modules
 =====================
 a. Modules are predefind commands/units which are used inside the playbooks or commands inorder to execute
@@ -13,32 +14,54 @@ B. Ansible playbook syntax
 a. Ansible playbook is a text file written in YAML(Ain't markup language) & stored with format .yml
 
 b. The sample format of that ansible playbook appears as
+---
+- hosts: all
+  become: yes
+  gather_facts: yes
+  tasks:
+    - task1
+    - task2
+    - task3
+  
+  Where
+  --- Indicates the starting of the playbook
+  - hosts: Points the list of hostnames that we are targeting to configure.
+  gather_facts: Capture the facts about the target machines
+  become: The ansible user becomes the root.
+  tasks: List of the activites that we are going to do.
+  task1: activity that we are going to do
+         Ex:
+        - name: "Installing git"
+          yum:
+            name: git
+            state: present
 
-	Explain every line ansible-day-3.png image
+c. Create a playbook for userid creation
+---
+- hosts: all
+  become: yes
+  gather_facts: yes
+  tasks:
+    user:
+      name: dhoni
+      state: present
 
-c. The playbooks uses the indendation with spaces inorder to indicate structure of the data.
+d. ansible-playbook -i ~/hosts -v user_creation.yml
+   The output appears in the following format
+  
+  PLAY RECAP ********************************************************************************************************************************************************************************************
+  client-0x0001              : ok=5    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+   
+  changed ==> The state of the target machine modified after executing particular task.
+  
+  ok ==> means there was no change on target machine state after executing particular task.
+  
+  unreachable ==> Not able to connect target machine, try with wrong ip address
+  
+  failed ==> Specific task failed due to some erorrs , try with error wrong pakage name
+  
+  skipped ==> Particular task skipped to run on specific host machine, run a task only on ubuntu {Discuss during conditional statements}
 
-	---
-	- hosts: all
-	  become: yes
-	tasks:
-		- user:
-			name: john
-			state: present
-		
-	Since we didn't followed indendation in right format we received syntax errors.
-
-d. PLAY RECAP ********************************************************************************************************************************************************************************************
-   client-0x0001              : ok=5    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-   
-   changed means there was a change during the task otherwise the state of the 
-   particular task was the same therefore we see ok which means nothing needed to be changed.
-   
-   unreachable ==> Not able to connect target machine, try with wrong ip address
-   
-   failed ==> Specific task failed due to some erorrs , try with error wrong pakage name
-   
-   skipped ==> Particular task skipped to run on specific host machine, run a task only on ubuntu
 				tasks:
 					- name: "Install git on rhel"
 					  yum:
@@ -52,7 +75,22 @@ d. PLAY RECAP ******************************************************************
 						state: present
 					  when: ansible_os_family == ubuntu
 					  
-	rescued: Need to work on this.
+	rescued: Need to work on this. {Discuss during conditional statements}
+
+  Explain every line ansible-day-3.png image
+
+e. The playbooks uses the indendation with spaces inorder to indicate structure of the data.
+
+	---
+	- hosts: all
+	  become: yes
+	tasks:
+		- user:
+			name: john
+			state: present
+		
+	Since we didn't followed indendation in right format we received syntax errors.
+
 
 e. gather_facts ==> i) Used to fetch target machine meta data details/facts
 						Example:
@@ -71,17 +109,60 @@ e. gather_facts ==> i) Used to fetch target machine meta data details/facts
 							  tasks:
 								- user:
 									name: john
-									state: present				
-												
-f. --check:
-		When ansible-playbook is executed with --check it will not make any changes on remote systems. 
-		It will report what changes they would have made rather than making them.
-		
-		UC:- Create a playbook for kohli user creation & before execute the playbook run it on check mode
-			 On target machine we don't see the kohli user after mode, since mode id dry run, it just report user
-			 creation chage is going to happen
+									state: present		
 
-g. UC1:- Create a playbook for installing packages
+f. become ==> 1. This used to get privilege escalation option & converts ansible user to get sudo privilges,
+              similarly that we used "-b" option in ad-hoc commands during group creation.
+
+              2. UC:- Create a user with become no option.
+              ===========================================
+
+              ---
+              - hosts: all
+                gather_facts: no
+                become: no
+                tasks:
+                  - name: "create user"
+                    user:
+                      name: john
+                      state: present
+
+              ansible-playbook -i ~/hosts -v user_creation.yml
+
+              The execution will get failed due to the permissions issue & we can solve it by setting become to yes.
+
+              3. By default become is set to no, if we don't use become option in our playbooks.
+
+												
+g. --check:
+		1. When ansible-playbook is executed with --check it will not make any changes on remote systems. 
+		   It will report what changes they would have made rather than making them.
+		
+		2. UC:- Create a playbook for kohli user creation & before execute the playbook run it on check mode
+			      On target machine we don't see the kohli user after mode, since mode id dry run, 
+            it just report user creation chage is going to happen
+
+              ---
+              - hosts: all
+                become: yes
+                gather_facts: no
+                tasks:
+                  - name: "create a user"
+                    user:
+                      name: kohli
+                      state: present
+
+              ansible-playbook -i ~/hosts -v user_creation.yml --check
+
+              Even we have executed our playbook, it hasn't created kohli user, 
+              It's just reported the changes what are all going happen.
+
+      3. Remove the --check option & execute playbook, now kohli user added on target system.
+         ansible-playbook -i ~/hosts -v user_creation.yml
+
+
+
+h. UC1:- Create a playbook for installing "git" package on ubuntu & rhel machine.
 
 		---
 		- hosts: all
@@ -92,15 +173,52 @@ g. UC1:- Create a playbook for installing packages
 			  yum:
 				name: git
 				state: present
-				
-	
-	UC2:- Playbook for Install apache(httpd) webserver, start it & later configure it 
+
+    ansible-playbook -i ~/hosts -v git_install.yml
+
+    The execution will be failed due to By default "yum" will acts package repo for RHEL machines & 
+                                                "apt" will acts package repo for ubuntu machines.
+
+    To overcome this issue we use "package" module to support installation of packages on any Linux flavours when package name same for all flavours.
+
+    ---
+    - hosts: all
+      gather_facts: no
+      become: yes
+      tasks:
+        - name "Installing git"
+          package:
+            name: git
+            state: present
+    
+    ansible-playbook -i ~/hosts -v git_install.yml
+      
+
+i. UC2:- Playbook for Install apache(httpd) webserver, start it & later configure it 
 			yum install httpd
 			service httpd start
 			echo "Welcome to ansible" > /var/www/html/index.html
-			
-			
-		
-		
-		
-		ansible-playbook -v user_creation.yml --check
+
+      ---
+      - hosts: all
+        become: yes
+        gather_facts: no
+        tasks:
+          - name: "Installing httpd"
+            yum:
+              name: httpd
+              state: present
+          
+          - name: "starting httpd service"
+            service:
+              name: httpd
+              state: started
+          
+          - name: "Configure the httpd service"
+            command: echo "Welcome to ansible" > /var/www/html/index.html
+
+      ansible-playbook -i ~/hosts -v httpd_setup.yml
+
+j. Grouping & subgrouping of servers
+
+k. LAMP stack setup with installation commands & customize it with loop
