@@ -34,9 +34,13 @@ sed -i s/PasswordAuthentication\ no// /etc/ssh/sshd_config
 sed -i s/\#PasswordAuthentication/PasswordAuthentication/ /etc/ssh/sshd_config
 systemctl reload sshd
 
-# Copy ssh key to target machine
+#####################################
+      # Copy ssh key to target machine
+#####################################
 #ssh-copy-id ansibel@<ipaddress>
 
-# Test connectivity
+####################################
+    # Test connectivity
+####################################
 #ansible -m ping all
 
