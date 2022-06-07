@@ -1,6 +1,6 @@
-##########################################
-    setup controller machine
-##########################################
+####################################################
+    #setup controller machine on Amazon Linux
+####################################################
 #!/bin/bash
 useradd ansible
 echo "ansible" | passwd --stdin ansible
@@ -21,7 +21,7 @@ amazon-linux-extras install ansible2 -y
 
 
 ############################################
-  setup node machine
+  #setup node machine
 ############################################
 useradd ansible
 echo "ansible" | passwd --stdin ansible
@@ -35,8 +35,8 @@ sed -i s/\#PasswordAuthentication/PasswordAuthentication/ /etc/ssh/sshd_config
 systemctl reload sshd
 
 # Copy ssh key to target machine
-ssh-copy-id ansibel@<ipaddress>
+#ssh-copy-id ansibel@<ipaddress>
 
 # Test connectivity
-ansible -m ping all
+#ansible -m ping all
 
