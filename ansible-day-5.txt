@@ -1,0 +1,297 @@
+Ansible-Day4
+
+-----------------------------------
+
+1. How to declare variable
+
+   ---
+
+   - hosts: all
+
+     become: yes
+
+     vars:
+
+              pkg_name: git
+
+     tasks:
+
+              - name: Install git
+
+          yum:
+
+                  name: {{ pkg_name }}
+
+            state: present
+
+ 
+
+Execute the playbook the and show installation done successfully.
+
+ 
+
+2. Override the git variable explicitly during ansible playbook execution
+
+              ansible-playbook -i hosts -v -e "pkg_name=tree" samp.yml
+
+ 
+
+3. Define variables in /etc/hosts as host variables & group variables
+
+ 
+
+              [webserver]
+
+              10.1.2.100          pkg_name=wget
+
+ 
+
+              [dbserver]
+
+              10.2.1.200
+
+              10.2.2.201
+
+             
+
+              [dbserver:vars]
+
+              pkg_name=apache2
+
+ 
+
+              Write a playbook to install the package using hostvars
+
+        
+
+              ---
+
+              - hosts: webserver
+
+                become: yes
+
+          tasks:
+
+                  - name: print the variable
+
+              debug:
+
+                             msg: The variable pkg_name is: "{{ pkg_name }}"
+
+ 
+
+              o/p:-
+
+              The variable pkg_name is: wget
+
+ 
+
+              ---
+
+              - hosts: dbserver
+
+                become: yes
+
+          tasks:
+
+                  - name: print the variable
+
+              debug:
+
+                             msg: The variable pkg_name is: "{{ pkg_name }}"
+
+ 
+
+ 
+
+             o/p:-
+
+              The variable pkg_name is: apache2
+
+ 
+
+ 
+
+              ---
+
+              - hosts: dbserver
+
+                become: yes
+
+          tasks:
+
+                  - name: print the variable
+
+              debug:
+
+                             msg: The variable pkg_name is: "{{ pkg_name }}"
+
+ 
+
+ 
+
+             o/p:-
+
+              The variable pkg_name is: wget
+
+              The variable pkg_name is: apache2
+
+ 
+
+4. Priorirty levels of variable
+
+              0 --> group_vars
+
+              1 --> host_vars
+
+              2 --> variable in playbook
+
+              3 --> variable passed throught the commandline
+
+ 
+
+   Example: Maintaing vars in group_vars(apache2),host_vars(wget),playbook(git) & command line(tree) and test the priority levels
+
+              ---
+
+              - hosts: all
+
+                become: yes
+
+          vars:
+
+                  pkg_name: git
+
+          tasks:
+
+                  - name: print the variable
+
+              debug:
+
+                             msg: The variable pkg_name is: "{{ pkg_name }}"
+
+             
+
+              exec1-
+
+              ansible-playbook -i hosts -e "pkg_name=tree" -v smp.yml
+
+              o/p:
+
+              The variable pkg_name is: tree
+
+ 
+
+              exec2:-
+
+              ansible-playbook -i hosts -v smp.yml      
+
+              o/p:
+
+              The variable pkg_name is: git
+
+ 
+
+              exec3:- Disable variable & define host vars for dbserver group also
+
+              ansible-playbook -i hosts -v smp.yml      
+
+              o/p:
+
+              The variable pkg_name is: wget
+
+ 
+
+              exec4:-
+
+              ansible-playbook -i hosts -v smp.yml      
+
+              o/p:
+
+              The variable pkg_name is: apache2
+
+ 
+
+ 
+
+5. New way of declaring the group_vars & host_vars
+
+ 
+
+   cd /home/ansible
+
+   ls
+
+   hosts
+
+   group_vars/webserver.yml
+
+   host_vars/10.1.2.100.yml
+
+ 
+
+   =======================================================
+
+   The host file contains details like
+
+  
+
+   [webserver]
+
+   10.1.1.100
+
+   10.1.1.101
+
+  
+
+   [dbserver]
+
+   10.1.2.100
+
+   ========================================================
+
+   webserver.yml
+
+   ---
+
+   pkg_name: git
+
+ 
+
+   ========================================================
+
+   10.1.2.100.yml
+
+   ---
+
+   pkg_name: tree
+
+   
+
+   ---
+
+   - hosts: webserver
+
+     become: yes
+
+     tasks:
+
+              - name: print the pkg_name
+
+          debug:
+
+                  msg: value of pkg_name is "{{ pkg_name }}"
+
+    ---
+
+    - hosts: 10.1.2.100
+
+      become: yes
+
+      tasks:
+
+              - name: print the pkg_name
+
+                debug:
+
+                  msg: value of pkg_name is "{{ pkg_name }}"
