@@ -1,0 +1,142 @@
+=================================
+A.Ansible vault
+=================================
+This feature allows us to encrypt the sensitive information like passwords & secretkey's rather than using it as
+a plain text in ansible playbooks or roles.
+
+1. Create a file with secretkey in plain text
+	echo "API_KEY: ThisIsSuperSecretDontDisplay" > vars/api_key.yml
+	
+2. Create a sample playbook to display value of the variable API_KEY
+	---
+	- hosts: all
+	  become: yes
+	  vars_file:
+		- vars/api_key.yml
+	  tasks:
+		- name: "Display the API_KEY value"
+		  debug:
+			msg: "{{ API_KEY }}"
+			
+	ansible-playbook -v test.yml
+	o/p: ThisIsSuperSecretDontDisplay
+	
+3. Let's encrypt the vars/api_key.yml file
+	
+   a. Encrypt the file
+		ansible-vault encrypt vars/api_key.yml
+		cat vars/api_key.yml
+	
+		The file whatever present vars/api_key.yml is encrypted now.
+		cat vars/api_key.yml
+	
+	b. So we can push this file to github along with our playbook/role.
+	
+	c. Execute ansible playbook
+	   ansible-playbook -v test.yml --ask-vault-pass
+	
+	d. Execute ansible playbook with password stored in a file
+	   ansible-playbook -v test.yml --vault-password-file
+	
+	e. Having a separate script file for getting the passwords is also possible. 
+	   You need to make sure the script file is executable and the password is printed to standard output for it to work without annoying errors.
+	   ansible-playbook launch.yml --vault-password-file ~/ .vault_pass.py
+	
+
+4. Decrypt the file
+	ansible-vault decrypt vars/api_key.yml
+
+5. View an Encrypted File in Ansible
+	ansible-vault view vars/api_key.yml
+	
+6. Edit an Encrypted File in Ansible
+	ansible-vault edit vars/api_key.yml
+	
+7. Change the password for the encrypted file
+	ansibe-vault rekey vars/api_key.yml
+
+========================
+B. What is ansible role?
+========================
+1. Normally when we write playbook for particular requirement we mention every thing in a single file
+	like
+		- tasks
+		- variables
+		- handlers
+		- metadata
+
+2. Ansible roles allow you to develop reusable automation components by grouping related automation things, 
+	- configuration files
+	- templates
+	- tasks
+	- handlers
+
+3. Roles will have structured layout.
+
+4. Ansible roles consists of multiple folders & each folder by default contains main.yml file.
+
+======================
+C. How to create a role
+======================
+1. Create ansible role for apache-setup	
+	ansible-galaxy init apache-setup
+
+2. The role structure of the apache-setup will be like
+
+	apache-setup
+	├── defaults
+	│   └── main.yml
+	├── files
+	├── handlers
+	│   └── main.yml
+	├── meta
+	│   └── main.yml
+	├── README.md
+	├── tasks
+	│   └── main.yml
+	├── templates
+	├── tests
+	│   ├── inventory
+	│   └── test.yml
+	└── vars
+		└── main.yml
+	
+3. Now let's understand every folder purpose,
+
+	a. defaults/main.yml ==> In this configuration file we declare default values for the varaibles. 
+						  Example: httpd is the default package name for installing apache on linux machine, 
+						  so we will declare it as variable here.
+					   
+	b. files ==> We copy the static files like .tar.gz/.zip files into this directory.
+	          During ansible role execution files that are present over here will be transfer to target machine.
+			  
+	c. handlers/main.yml ==> In this section we will declare handlers like restart apache.
+	
+	d. meta/main.yml ==> It's metadata file, which contains the information like
+								- author
+								- license
+								- depenkdency management
+						
+						 From this we can another dependecy role for current apache-setup role.
+							Example: Let's assume we have two roles for maven-setup & java-setup
+								When we create maven-setup role, we can make java-setup role as dependecy in meta/main.yml
+								
+	
+	e. README.md ==> In this file we write Description about the role & its usage.
+	
+	f. tasks  ==> In this folder we will create the list of the .yml files related to our activities
+				  Example:
+					Installing apache {apache.yml}
+					Configure apache {configure.yml}
+
+	g. templates ==> This folder contains the template files(jinja2) used by the role to create the actual configuration files.
+					 Example: After installation there might be need to update the configuration files as well, 
+					          like including usernames/osdetails inorder to do this we will use templates.
+							  
+	h. vars ==> Used to declare the variables that are needed for ansible playbooks
+	
+	Here we can see variables we can declare at defaults/main.yml & vars/main.yml.
+	
+	The variables which are declared in vars/main.yml have high priority.
+
+4. Create a ansible for apache-setup & push it github
