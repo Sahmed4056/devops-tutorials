@@ -1,0 +1,129 @@
+
+Ansible components
+==================
+Before jump into ansible further we have to get familar with few of terminologies
+
+/etc/ansible/ansible.cfg ==> Is the default configuration file of ansible, which is useful to manage
+                             ansible playbooks or ansible commands.
+                             I will discuss more details with example in sometime.
+                             
+/etc/ansible/hosts ==> Is the default inventory file, contains list of target machine IP addresses/hostnames.
+
+tasks ==> Activites that we are going to managed on target servers.
+          - Installing git activity on target server will be considered as one activity.
+            yum install git -y
+          - Starting the httpd service activity on target server will be considered as one activity.
+            systemctl start httpd
+            
+playbooks ==> Playbooks are collection of tasks
+
+modules ==> Modules are predefind commands/units which are used inside the playbooks or commands inorder 
+            to execute on target machines.
+            
+Ansible Ad-hoc commands
+=========================
+When you have a need of run repeated task on setup of servers then we can use ansible adhoc commands.
+
+a. Let's assuming on quatery patching cycle you have rebooted large number of servers & you want to find which are the servers up & running.
+   ansible -m ping all
+
+    syntax:
+    ansible -m <module_name> -a "argument" <group_name/all>
+
+
+b. Command module:-  Used excute any shell command target machine, then we use shell command
+
+    Find out uptime of the list of servers.
+    ansible -m command -a "uptime" all
+    
+    Find out the home directory of ansible user in target machines
+    ansible -m command -a "pwd" all
+    
+c. stat: Displays the staticis of the file
+    ansible -m stat -a "/etc/hostname" all
+    
+e. group: used to create/delete groups on target machines  {Cache issue}
+   Create a unix user group with ansible ad hoc command
+   i. Create a user name group named dbadmin using the ansible group module.
+      ansible -i ~/hosts -m group -a "name=dbadmin state=present" all
+      
+   ii. Delete a user name group named dbadmin using the ansible group module.
+      ansible -i ~/hosts -m group -a "name=dbadmin state=absent" all
+
+f. COPY: Used to copy the files to target machine from controller machine
+    ansible -i ~/hosts -m copy -a "src=/etc/hosts dest=/tmp/hosts mode=600"
+    
+g. file:
+    i. create a new directory with 755 permisssion
+       ansible -m file -a "path=/opt/oracle state=directory mode=0755" all
+    ii. create a new file with 755 permisssion
+       ansible -m file -a "path=/opt/oracle state=file mode=0755" all
+    
+h. yum:
+    Install a package or software in linux using yum module of ansible
+    ansible -m yum -a "name=httpd state=installed" all
+    
+    Remove sudo access on target & repeate yum module, if we don't have sudo access on remote installation
+    will be failed.
+    
+i. service:
+    start/stop httpd service on target machine
+    # To Start
+    ansible -m service -a "name=httod state=started enabled=yes" all
+    
+    # To Stop
+    ansible -m service -a "name=httpd state=stop enabled=yes" all
+    
+j. get_url:
+    Download a file from URL in ansible
+    ansible -m get_url -a "url=https://nodejs.org/dist/v14.17.4/node-v14.17.4-linux-x64.tar.xz dest=/tmp mode=0755" all
+
+k. setup:
+    Displays facts about the target machines
+    ansible -m setup all
+
+
+=============================================    
+Inventory file
+==============================================
+The inventory file have a set of nodes which we are going to target.
+
+a. The default inventory file is /etc/ansible/hosts
+
+b. We can't change every time the default inventory file we can change it using -i option
+   -i hosts
+
+    Use inventory file other than default inventory file
+    ansible -i ~/hosts -m command -a "uptime" all
+
+c. We can change the inventory file location to different file permanently by modifing ansible.cfg
+    inventory=/root/hosts
+    library ==> Contains modules that are present ansible
+    remote_tmp ==> When we execute ansible commands it requires some temporary space required  on remote side.
+    local_tmp ==> When we execute ansible commands it requires some temporary space required  on local side.
+    forks ==> The number of parallel executions on target machine
+               suppose if you have 100 machines & fork count is 5 only first 5 servers completed & next go for another 5 like that till 100
+    poll_intervel ==> 
+    
+    module = command
+        ansible all -a "uptime"
+        ansible all -a "name: git state: present"
+    change module to yum & execute
+        ansible all -a "name: git state: present"
+
+
+
+
+
+
+
+
+
+
+
+Explain Idempotency
+Explain change/without & 
+    
+    
+
+                          

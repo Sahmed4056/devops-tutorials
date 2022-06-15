@@ -1,0 +1,48 @@
+Docker products
+=============
+
+Docker community edition(Dokcer CE) - These are use for freely & we can do activites like image creation, container creation, pushing images to dockerhub ..etc.
+Docker Entrpirse edition(Docker EE) - Addons - Image scanning, paid support ..etc
+
+Docker community edition
+
+Linux 
+Macos
+Windows
+
+Basic commands in docker
+=========================
+To check available Images on docker host machine
+	docker images
+
+To download Images dockerhub to docker host machine
+	docker pull ubuntu
+
+List down running containers
+	docker ps
+
+List all containers(with running aswell stopped)
+	docker ps -a
+
+How to spin a container
+	docker run ubutnu:latest
+
+
+How to connect running docker containers
+	docker exec -it <container_name/Contained_id> /bin/bash
+
+Stop the container
+	docker stop bc5a91a9196b
+
+Delete the container
+	docker rm <container_id>
+
+Delete all the containers(running as well stopped containers)
+ 	docker rm -f $(docker ps -a -q)
+
+Delete docker image
+	docker rmi centos:latest
+
+Delete all the docker images
+	docker rmi -f (docker images -q)
+

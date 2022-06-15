@@ -1,0 +1,312 @@
+=================
+dockerfile
+=================
+It is a normal script file contains the set of instructions which are useful to build a Docker image. 
+dockerfile ==> docker image ==> container
+
+=====
+FROM  
+=====
+In every dockerfile the first line is FROM instruction.
+The FROM used to pull the base image & that we are looking to customize it.
+
+Ex:- 
+FROM ubuntu:latest
+
+======
+LABEL 
+======
+LABEL instruction used to stores meta data information about docker Image, like who is the author of the dockerImage.
+As best practice purpose only we use LABEL instruction.
+
+Ex:- 
+LABEL owner chaitanya
+LABEL team XYZ
+
+=====
+RUN   
+=====
+RUN instruction used execute shell commands, I mean any linux commands
+
+Ex:- 
+RUN apt-get install wget -y
+RUN apt-get install tree -y
+RUN apt-get install vim -y
+
+------------
+usecase-1
+------------
+Create a custom docker image with git presence
+FROM ubuntu:latest
+LABEL owner chaitanya
+RUN apt-get install git -y
+
+
+docker build -t custom_git:latest -f dockerfile
+
+docker images
+
+docker run -it custom_git:latest /bin/bash
+
+git --version
+
+
+-----------
+usecase-2
+------------
+Use single RUN instruction for instead of mutliple run instructions
+
+FROM ubuntu:latest
+LABEL owner chaitanya
+RUN apt-get install git -y
+RUN apt-get install wget -y
+RUN apt-get install tree -y
+RUN apt-get install vim -y
+
+
+FROM ubuntu:latest
+LABEL owner chaitanya
+RUN apt-get install git -y && \
+    apt-get install wget -y && \
+    apt-get install tree -y && \
+    apt-get install vim -y
+
+
+
+----------------------------------------------------------------------------------------------------------------
+=====
+CMD
+=====
+CMD instruction is used to provide default command & parameters to docker container.
+We can easily override the default commands that are mentioned in CMD while spinning up container.
+If we have mutliple CMD instructions in dockerfile the last CMD instruction only will be applied.
+
+
+Usecase3:- Create docker image with default echo command for docker container using CMD
+----------------------------------------------------------------------------------------
+FROM ubuntu
+LABEL Chaitanya
+RUN apt-get update
+CMD ["echo", "Hello World"]
+
+The each string in shell command will be double quoted, then only CMD will consider it as command.
+
+
+docker build -t basic_cmd:1.0 -f dockerfile
+docker images
+docker run -d basic_cmd:1.0
+
+The container will gets spinned up & execute the default echo command inside container & container will get stopped automatically since there is no long
+running command inside it.
+
+
+
+Usecase4:- Create docker image such way that it should be up & running as long you stop it explicitly using CMD
+------------------------------------------------------------------------------------------------------------------
+FROM ubuntu
+LABEL owner chaitanya
+RUN apt-get update -y
+RUN apt-get install iputils-ping -y
+CMD ["ping", "google.com"]
+
+docker build -t basic_cmd:2.0 -f dockerfile
+docker images
+docker run basic_cmd:2.0
+
+
+Usecase5:- Override the shell commands in CMD instruction
+----------------------------------------------------------
+docker run basic_cmd:2.0 hostname
+
+The hostname command overrides the default ping command & prints the hostname of the container.
+
+============
+ENTRYPOINT
+============
+Similar to CMD instruction, ENTRYPOINT instruction also is used to provide default command & parameters to docker container.
+
+What is the difference between CMD and ENTRYPOINT? 
+You cannot override the ENTRYPOINT instruction by adding command-line parameters to the docker run command. 
+By opting for this instruction, you imply that the container is specifically built for such use.
+
+
+Usecase6:- Create docker image with default echo command for docker container using ENTRYPOINT
+-------------------------------------------------------------------------------------------------
+FROM ubuntu
+MAINTAINER sofija
+RUN apt-get update
+ENTRYPOINT ["echo", "Hello World"]
+
+
+docker build -t basic_entrypoint:1.0 -f dockerfile /root
+docker images
+docker run basic_entrypoint:1.0
+
+Prints the Hello World & container will be stopped automatically
+
+
+Usecase7:- Create docker image such way that it should be up & running as long you stop it explicitly using CMD
+------------------------------------------------------------------------------------------------------------------
+FROM ubuntu
+LABEL owner chaitanya
+RUN apt-get update -y
+RUN apt-get install iputils-ping -y
+ENTRYPOINT ["ping", "google.com"]
+
+
+docker build -t basic_entrypoint:2.0 -f dockerfile /root
+docker images
+docker run basic_entrypoint:2.0
+
+
+
+Usecase8:- Try to override the shell commands in ENTRYPOINT instruction
+----------------------------------------------------------
+docker run basic_entrypoint:2.0 hostname
+
+The hostname command just append as string to the default ping command & prints the hostname
+
+
+
+Usecase9:- Using CMD + ENTRYPOINT
+---------------------------------
+FROM ubuntu
+LABEL Chaitanya
+RUN apt-get update
+ENTRYPOINT ["echo", "Hello"]
+CMD ["World"]
+
+--------
+WORKDIR
+--------
+WORKDIR instruction used to define the working directory of a Docker container at any given time.
+Ex:-
+FROM ubuntu:latest
+RUN apt-get update -y
+RUN apt-get install git -y
+RUN touch 1.out 2.out 3.out
+
+docker build -t custom_img:latest .
+docker run -it custom_img:latest /bin/bash
+
+Here the we can obeserve that the default working directory "/" & files are created under "/"
+
+
+Usecase10:- Create a custom WORKDIR
+------------------------------------------------------------------------
+FROM ubuntu:latest
+WORKDIR /project
+RUN apt-get update -y
+RUN apt-get install git -y
+RUN touch 1.out 2.out 3.out
+
+Here the we can obeserve that the default working directory "/project" & files are created under "/project"
+
+------
+ADD
+------
+The ADD command is used to copy files/directories into a Docker image. It can copy data in three ways:
+
+	a. Copy files from the local storage to a destination in the Docker image.
+	b. Copy a tarball from the local storage and extract it automatically inside a destination in the Docker image.
+	c. Copy files from a URL to a destination inside the Docker image.
+
+
+Ex:-
+---
+FROM ubuntu:latest
+WORKDIR /project
+RUN mkdir test
+ADD codes /project/test
+ADD abc.out /project/test
+
+------
+COPY
+------
+The COPYcommand is used to copy files/directories into a Docker image. It can copy data in three ways:
+
+Ex:-
+------
+FROM ubuntu:latest
+WORKDIR /project
+RUN mkdir test
+COPY codes /project/test
+COPY abc.out /project/test
+
+
+-------
+EXPOSE
+-------
+
+EXPOSE instructions informs the docker that the container listens on specific port at runtime.
+Jenkins container will listens on port 8080
+Ex:- 
+
+EXPOSE 8080
+
+
+====================================================
+Build tomcat docker image with deployable package
+====================================================
+1. Take centos as base image
+2. Install tomcat inside docker Image
+3. Copy the sample war artifact
+4. Expose port 8080, since tomcat listens on port 8080
+5. Run tomcat as service
+
+FROM centos
+LABEL Chaitanya
+RUN mkdir /opt/tomcat/
+WORKDIR /opt/tomcat
+RUN curl -O https://www-eu.apache.org/dist/tomcat/tomcat-8/v8.5.40/bin/apache-tomcat-8.5.40.tar.gz
+RUN tar xvfz apache*.tar.gz
+RUN mv apache-tomcat-8.5.40/* /opt/tomcat/.
+RUN yum -y install java
+RUN java -version
+WORKDIR /opt/tomcat/webapps
+RUN curl -O -L https://github.com/AKSarav/SampleWebApp/raw/master/dist/SampleWebApp.war
+EXPOSE 8080
+CMD ["/opt/tomcat/bin/catalina.sh", "run"]
+
+====================================================
+
+-----
+ARGS
+-----
+ARG instruction defines the variables during docker image creation.
+
+FROM ubuntu:latset
+LABEL chaitanya
+WORKDIR /
+ARG user1 chai
+RUN echo $user1 > user_name.out
+
+docker build -t myarg:1.0 .
+docker run -it myarg:1.0 /bin/bash
+
+cat /user_name.out
+
+Override the user1 value
+docker build -t myarg:2.0 --build-arg user1=tom .
+
+
+----
+ENV
+----
+ENV instruction is used to set the Environment for the future containers which are created from custom dockerimage.
+
+FROM ubuntu:latest
+WORKDIR /project
+ENV http_proxy http://10.0.0.0:8000
+RUN echo $http_proxy
+
+
+----
+VOL
+----
+Create a volume inside a container & persist data even container killed/terminated
+FROM ubuntu:latest
+RUN mkdir /data
+WORKDIR /data
+RUN echo "Hello from Volume" > test
+VOLUME /data

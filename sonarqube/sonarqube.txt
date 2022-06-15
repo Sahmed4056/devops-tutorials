@@ -1,0 +1,183 @@
+========================================================================================================================================================================
+						Sonarqube-Day-1
+========================================================================================================================================================================
+
+===============================================================
+A. What is sonarqube & what are advantages of the sonarqube?
+===============================================================
+
+a. Before we understand about sonarqube let's jump into development phase of a project.
+   Once the developer develops the code, the code quality check needs to be done by peer reviewer.
+
+b. Code quality is nothing but, the source code whatever we developed is
+
+	- Is it bugfree?
+
+	- Is it secure? Does it containing any vulnerabilities like password hardcoded
+
+	- Duplication avoided? Due to reusability purpose some place code was duplicated
+
+	- Tested properly?
+
+	- Complex cide? Developer written particular requirement complexed way even there was a choice to written simple way.
+
+	- Is it easy interagble with other code in the team?
+
+c. So every time whenever the code development completed, peer reviewer has to validate the code quality & this should be a repetative & its tedious task
+   when there is large source files present.
+
+d. To overcome this issue static code analysis tools came into picture & this tools will analyze the source code & 
+   automatically generates code analysis report.
+
+
+e. We have static code anlaysis tools like
+	- sonarqube
+	- coverity
+	- Veracode
+	- codescene
+
+
+f.  Sonarqube is mostly used static analyis tool in companies, why because its not only acts as static code analysis tool but it will acts as a quality management tool.
+
+	- Code analysis {will be done by static code analysis}
+	- Code coverage {will be done by quality management analysis}
+	- Test coverage {will be done by quality management analysis}
+
+    Display the sonarqube project just tell what is bugs, vulnerabilties, duplications, unitests & code coverage..etc.
+
+
+===============================
+B. sonarqube server components
+===============================
+There are mainly 4 components in "sonqrqube server".
+1. Rules
+	Rules are nothing but a set of instructions or guidelines developers need to follow while writting the source code as best practices.
+	By default many rules for each programming language comes along with sonarqube installation.
+
+2. Database
+	We have rules, that will run against the source code & generates the analysis report.
+	The analysis report containing the
+		- Bugs
+		- Vulnerabilities
+		- Code duplications..etc
+	This analysis report will be stored in the database.
+
+3.WebUI
+       Web interface UI is used to read the data from database & displays the report in the undestandable format. like SonarProject
+
+4. Elastic search: Search server based in ES used to search data from sonarqube databse.
+
+================
+C. Sonarscanner
+================
+1. Sonarscanner is agent a which will be in the source code is present.
+
+2. Let's assume you have Java source code present on some ec2 machine & you want to analyze the source code, 
+   then we will install sonsarscanner in that ec2 machine.
+
+Sonarqube support almost 27 programming languages.
+
+=========================
+D. How sonarqube works?
+=========================
+
+Explain the sonarqube architecture sonarqube-day-1.png
+
+1. Once we run the sonarscanner on developer machine, sonarscanner will capture the required information about the source code base on sonar-project.properties files & report to sonarqube server.
+
+2. Next from sonarqube server required set of rules will be gathered by sonarscanner inorder to validate the code quality.
+
+3. Once rules applied on source code, analysis report will be generated & it will be saved in sonarqube database.
+
+4. Using web interface UI we can read the analysis report in graphical mode.
+
+5. Elastic search is used to search data on the   sonarqube database
+
+
+===========================
+E. How to setup sonarqube
+===========================
+
+
+
+================================
+F. How to install sonar-scanner
+================================
+1. We will install sonar-scanner when there is no specific scanner for the build system. Like NodeJs applications
+2. We have some of the build tools which will comes including scanner like maven, so if we run mvn sonar:sonar goal it will publish analysis report to sonarqube.
+
+
+
+
+======================================================
+G.Code analysis on Maven project using sonarqube
+======================================================
+git clone https://github.com/chaitanyaredd/maven-examples.git
+cd maven-examples/maven-code-coverage
+mvn clean install
+mvn sonar:sonar -Dsonar.login=<sonar_token>
+
+
+Projects ==> Are the analysis report for each source code repository.
+
+Rules ==> Instructions/guideline for each source code language that has to follow as best practice, If any rule is violated that will treated as bug/vulnerability/codesmell..etc
+
+Quality profile ==> Set of Rules that can be applied sonarqube project depends upon respective language.
+
+Quality gates ==> Enforces sonarqube projects that has to pass few metrics inorder make sure is my project ready for further stages.
+			code coverage > 80%
+			bugs = 0
+			vulnerabilties = 0
+
+
+============================================
+H. How to integrate sonarqube with Jenkins
+============================================
+
+
+
+
+
+=========================================================
+I. Change the quality profile for the sonarqube project
+=========================================================
+1. By default the default the quality profile we used is sonarway, which will contain lesser rules compared to rules in specific language.
+
+2. Create new quality profile named: maven-profile with all rules.
+
+3. Add the sonar project under the maven-profile quality profile.
+
+4. Reexcute jenkins job & verify quality profile is changed or not.
+
+
+============================================
+J. Setup quality gate for Sonarqube project
+============================================
+1. Create a quality gate in sonarqube with metrics
+	code coverage > 80%
+	bugs = 0
+	vulnerabilities = 0
+	code duplication < 3%
+
+2. Reexecute jenkins job & check project status failed or not. - Project must be failed state in Sonarqube
+
+
+3. Fail the jenkins job if the sonarqube project is failed state
+	Include a shell script in the free-style job.
+
+
+
+
+
+
+
+
+
+
+Practice:
+=======================================================
+I. Code analysis on Nodejs project using sonarqube
+=======================================================
+Repo:
+Build commands:
+Sonar-scanner command:
