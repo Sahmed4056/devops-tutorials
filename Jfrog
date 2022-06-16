@@ -1,0 +1,49 @@
+How to setup Jfrog Artifactory
+==============================
+
+Prerequisites
+-------------
+1. Create EC2 with instance type of t2.small
+2. Allow the ports 8081 & 8082
+
+
+Installation steps
+------------------
+There two types of installables avaialble for Jfrog
+a. pro installer --> It's Licensed version
+b. oss installer --> It's a free open source solution
+
+1. Login to EC2 with root user & install java
+	yum install java-1.8* -y
+	
+2. Download the artifactory installers into /opt
+	There two types of installables avaialble for Jfrog
+		a. pro installer --> It's Licensed version
+		b. oss installer --> It's a free open source solution
+	Now let's install oss installer
+	
+	cd /opt
+	wget -O https://releases.jfrog.io/artifactory/bintray-artifactory/org/artifactory/oss/jfrog-artifactory-oss/6.23.42/jfrog-artifactory-oss-6.23.42.zip
+	
+3. Extract the archive
+	unzip jfrog-artifactory-oss-6.23.42.zip
+	mv jfrog-artifactory-oss-6.23.42 jfrog
+
+4. Set JFROG_HOME variable
+	echo "export JFROG_HOME=/opt/jfrog" > /etc/profile.d/jfrog.sh
+	source /etc/profile/jfrog.sh
+	
+5. Run a startup script
+	cd /opt/jfrog/app/bin/
+	./artifactory.sh start
+	
+6. Access the artifactory from browser
+	http://<dnshostname>:8081
+	
+7. Default credentials to login jfrog artifactory
+	user: admin
+	password: password
+
+8. Change the default password
+
+9. Choose a repository maven project, by default 5 repositories will gets created.
