@@ -1,3 +1,6 @@
+==========================================================================================================================================================
+								Day-1
+==========================================================================================================================================================
 1. What is artifact?
    a. Artifact is a binary file which is geneated as part of build execution on the source code.
    
@@ -128,9 +131,10 @@ c. Pull the depedencies from Jfrog artifactory rather than Central repo
 	D. mvn clean install
 		Artifacts will be downloaded from Jfrog repositories
 		
-==========================================================================================
-7. How to integreate Jfrog Artifactory with Jenkins Freestyle project
-==========================================================================================
+==========================================================================================================================================================
+								Day-2
+==========================================================================================================================================================
+1. How to integreate Jfrog Artifactory with Jenkins Maven project
 
 	a. Install "Artifactory" plug-in
 		Manage Jenkins -> Jenkins Plugins -> available -> artifactory
@@ -154,6 +158,67 @@ c. Pull the depedencies from Jfrog artifactory rather than Central repo
 		Deploy Artifacts to Artifactory : <provide Artifactory server and repository details>
 		Execute job
 		
-==========================================================================================
-8. How to download Jfrog Artifact with Jenkins Freestyle project
-==========================================================================================
+
+2. How to download Jfrog Artifact with Jenkins Freestyle project
+
+
+3. How to Upload & resolve artifact from Jfrog
+	pipeline {
+	    agent any
+	    stages {
+		stage ('Clone') {
+		    steps {
+			git branch: 'master', url: "https://github.com/jfrog/project-examples.git"
+		    }
+		}
+
+		stage ('Artifactory configuration') {
+		    steps {
+			rtServer (
+			    id: "ARTIFACTORY_SERVER",
+			    url: SERVER_URL,
+			    credentialsId: CREDENTIALS
+			)
+
+			rtMavenDeployer (
+			    id: "MAVEN_DEPLOYER",
+			    serverId: "ARTIFACTORY_SERVER",
+			    releaseRepo: ARTIFACTORY_LOCAL_RELEASE_REPO,
+			    snapshotRepo: ARTIFACTORY_LOCAL_SNAPSHOT_REPO
+			)
+
+			rtMavenResolver (
+			    id: "MAVEN_RESOLVER",
+			    serverId: "ARTIFACTORY_SERVER",
+			    releaseRepo: ARTIFACTORY_VIRTUAL_RELEASE_REPO,
+			    snapshotRepo: ARTIFACTORY_VIRTUAL_SNAPSHOT_REPO
+			)
+		    }
+		}
+
+		stage ('Exec Maven') {
+		    steps {
+			rtMavenRun (
+			    tool: MAVEN_TOOL, // Tool name from Jenkins configuration
+			    pom: 'maven-examples/maven-example/pom.xml',
+			    goals: 'clean install',
+			    deployerId: "MAVEN_DEPLOYER",
+			    resolverId: "MAVEN_RESOLVER"
+			)
+		    }
+		}
+
+		stage ('Publish build info') {
+		    steps {
+			rtPublishBuildInfo (
+			    serverId: "ARTIFACTORY_SERVER"
+			)
+		    }
+		}
+	    }
+	}
+	
+
+4. How to Upload & download specific artifact into particular repo in Unique way
+	a. Move the artifact created as part of onlinebookstore.war into target repo like onlinebookstore/${JOB_NAME}/${BUILD_TIMESTAMP}/onlinebookstore.war
+	b. Download the latest artifact from target repo like onlinebookstore/${JOB_NAME}/${BUILD_TIMESTAMP}/onlinebookstore.war
