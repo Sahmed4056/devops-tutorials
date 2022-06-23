@@ -219,6 +219,63 @@ c. Pull the depedencies from Jfrog artifactory rather than Central repo
 	}
 	
 
+=================
+Practice-session
+=================
 4. How to Upload & download specific artifact into particular repo in Unique way
 	a. Move the artifact created as part of onlinebookstore.war into target repo like onlinebookstore/${JOB_NAME}/${BUILD_TIMESTAMP}/onlinebookstore.war
 	b. Download the latest artifact from target repo like onlinebookstore/${JOB_NAME}/${BUILD_TIMESTAMP}/onlinebookstore.war
+	
+	pipeline {
+	    agent any
+
+	    stages {
+		stage ('Clone') {
+		    steps {
+			git branch: 'master', url: "https://github.com/jfrog/project-examples.git"
+		    }
+		}
+
+		stage ('Upload') {
+		    steps {
+			rtUpload (
+			    // Obtain an Artifactory server instance, defined in Jenkins --> Manage Jenkins --> Configure System:
+			    serverId: SERVER_ID,
+			    spec: """{
+				    "files": [
+					    {
+						"pattern": "jenkins-examples/pipeline-examples/resources/ArtifactoryPipelineNoProps.zip",
+						"target": "libs-snapshot-local/jfrog-examples/${BUILD_TIMESTAMP}"
+					    }
+					]
+				    }"""
+			)
+		    }
+		}
+
+		stage ('Download') {
+		    steps {
+			rtDownload (
+			    serverId: SERVER_ID,
+			    spec: """{
+				    "files": [
+					    {
+						"pattern": "libs-snapshot-local/jfrog-examples/${BUILD_TIMESTAMP}/*(Pipeline).zip",
+						"target": "Bazinga/{1}/"
+
+					    }
+					]
+				    }"""
+			)
+		    }
+		}
+
+		stage ('Publish build info') {
+		    steps {
+			rtPublishBuildInfo (
+			    serverId: SERVER_ID
+			)
+		    }
+		}
+	    }
+	}
