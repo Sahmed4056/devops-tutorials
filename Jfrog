@@ -279,3 +279,7 @@ Practice-session
 		}
 	    }
 	}
+
+
+(gci <dir> -r | ? {$_.PSIsContainer -eq $True}) | ?{$_.GetFileSystemInfos().Count -eq 0} | select FullName | 
+ForEach-Object{[void](New-Item -Path $_.FullName -Name "README.md" -ItemType File -Value "The first sentence in our file.")}
