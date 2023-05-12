@@ -16,8 +16,14 @@ n. grep - This filter search a particular pattern in a file & displays all the l
 	cat temp.txt | egrep 'great|operating'
 	
 o. more <file>
+    i. What command we use normally to view content of file? - cat command
+    ii. Suppose when we have a large file with so many lines, if we use cat command all lines will be displayed at a time, but we have to scroll-up & scroll-down to view the content. 
+    iii. with more command only one page will get displayed at a time on the screen & to read rest of the lines we can read it using different like
+          space --> to view the next page
+	  enter --> to read the next line
+	  q  --> quit the command prompt
 
-p. sort - Sort command used to sort a file & arranges records in particular order.
+p. sort - Sort command used to sort the lines of a file & arranges records in particular order.
 	cat > file.txt
 abhishek
 chitransh
@@ -38,7 +44,7 @@ harsh
 	harsh
 	
 
-q. uniq - uniq is the tool that helps to detect the adjacent duplicate lines and also deletes the           duplicate lines
+q. uniq - uniq is the tool that helps to detect the adjacent duplicate lines and deletes the duplicate lines
    cat kt.txt
 I love music.
 I love music.
@@ -46,6 +52,9 @@ I love music.
 I love cricket.
 I love music.
 
+If you want to print only unique lines that are present in a file, we have to use sort & uniq command in combination
+
+sort file.txt | uniq
 
 r. history
 
